@@ -16,7 +16,7 @@ class MapleStoryEnv(gym.Env):
         new_game_screen = capture_screen(game_window)
         new_state = preprocess_image(new_game_screen)
         new_state = np.zeros((84, 84))  # Replace with the actual new state (preprocessed image)
-        reward = 0  # Replace with the actual reward
+        reward = calculate_reward(previous_state, self.current_state)  # Replace with the actual reward
         done = False  # Replace with the actual done status
 
         return new_state, reward, done, {}
@@ -34,3 +34,35 @@ class MapleStoryEnv(gym.Env):
 
     def close(self):
         pass  # You can implement a close method if needed
+
+
+def calculate_reward(previous_state, current_state):
+    # Weights for different reward components
+    exp_weight = 1.0
+    hp_potion_weight = 0.5
+    mp_potion_weight = 0.5
+    death_penalty_weight = -10.0
+
+    # Experience gain
+    previous_exp = previous_state['experience']
+    current_exp = current_state['experience']
+    exp_reward = (current_exp - previous_exp) * exp_weight
+
+    # HP/MP potion management
+    previous_hp_potions = previous_state['hp_potions']
+    current_hp_potions = current_state['hp_potions']
+    hp_potion_reward = (previous_hp_potions - current_hp_potions) * hp_potion_weight
+
+    previous_mp_potions = previous_state['mp_potions']
+    current_mp_potions = current_state['mp_potions']
+    mp_potion_reward = (previous_mp_potions - current_mp_potions) * mp_potion_weight
+
+    # Death penalty
+    previous_lives = previous_state['lives']
+    current_lives = current_state['lives']
+    death_penalty = (previous_lives - current_lives) * death_penalty_weight
+
+    # Total reward
+    total_reward = exp_reward + hp_potion_reward + mp_potion_reward + death_penalty
+
+    return total_reward

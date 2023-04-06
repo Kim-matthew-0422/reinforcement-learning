@@ -4,7 +4,7 @@ from mss import mss
 import time
 
 from pytesseracter import extract_experience_values
-
+from tesseractOCRmodel import preprocess_image_for_ocr
 import pytesseract
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
@@ -34,7 +34,7 @@ game_window = {
     "height": 600
 }
 
-def preprocess_image(image, target_sqize=(84, 84)):
+def preprocess_image(image, target_size=(84, 84)):
     resized_image = cv2.resize(image, target_size, interpolation = cv2.INTER_AREA)
     grayscale_image = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)
     normalized_image = grayscale_image.astype(np.float32) / 255.0
@@ -50,9 +50,10 @@ while True:
     draw_border(game_screen, border_thickness=5, border_color=(0, 255, 0))
    
     cv2.imshow('game screen', game_screen)
-    gray_game_screen = cv2.cvtColor(game_screen, cv2.COLOR_BGR2GRAY)
-    exp = extract_experience_values(gray_game_screen)
-    # Press 'q' to exit the loop.
+    exp = extract_experience_values(game_screen)
+    
+    
+    # Press 'q' to exit the loop.qqqqqqq
    
     time_elapsed = time.time() - start_time
    
